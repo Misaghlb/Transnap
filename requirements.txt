@@ -1,0 +1,7 @@
+requests
+Pillow
+keyboard
+pyperclip
+keyring
+arabic_reshaper
+python-bidi
