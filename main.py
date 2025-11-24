@@ -58,7 +58,9 @@ class ScreenTranslatorApp:
     def __init__(self):
         self.root = tk.Tk()
         self.root.title("Transnap")
-        self.root.geometry("450x300") # Increased height for new UI elements
+        self.root.geometry("500x450") 
+        self.root.resizable(True, True)
+        self.root.minsize(450, 400)
         
         self.current_theme = "dark"
         self.colors = self.THEMES[self.current_theme]
@@ -73,6 +75,7 @@ class ScreenTranslatorApp:
         self.config_path = os.path.join(os.path.expanduser("~"), ".transnap_config.json")
         self.preferences = self.load_preferences()
         self.target_lang = self.preferences.get("language", "Farsi")
+        self.shortcut = self.preferences.get("shortcut", "windows+shift+a")
 
         # Check for API Key
         self.api_key = self.load_config()
@@ -81,7 +84,7 @@ class ScreenTranslatorApp:
             
         # Register Hotkey
         try:
-            keyboard.add_hotkey('windows+shift+a', lambda: self.root.after(0, self.start_snip))
+            keyboard.add_hotkey(self.shortcut, lambda: self.root.after(0, self.start_snip))
         except Exception as e:
             print(f"Failed to register hotkey: {e}")
         
@@ -96,6 +99,36 @@ class ScreenTranslatorApp:
             base_path = os.path.abspath(".")
 
         return os.path.join(base_path, relative_path)
+
+    def is_admin(self):
+        try:
+            return ctypes.windll.shell32.IsUserAnAdmin()
+        except:
+            return False
+
+    def restart_as_admin(self):
+        try:
+            if sys.argv[0].endswith('.exe'):
+                # If running as exe
+                ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.argv[0], None, None, 1)
+            else:
+                # If running as python script
+                # Try to use pythonw.exe to avoid console window
+                executable = sys.executable
+                if executable.endswith("python.exe"):
+                    pythonw = executable.replace("python.exe", "pythonw.exe")
+                    if os.path.exists(pythonw):
+                        executable = pythonw
+                
+                # Quote arguments to handle spaces in paths
+                args = f'"{sys.argv[0]}"'
+                if len(sys.argv) > 1:
+                    args += " " + " ".join([f'"{arg}"' for arg in sys.argv[1:]])
+
+                ctypes.windll.shell32.ShellExecuteW(None, "runas", executable, args, None, 1)
+            self.root.destroy()
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to restart as admin: {e}")
 
     def load_custom_font(self, font_path, font_name):
         # Resolve path for PyInstaller
@@ -171,6 +204,34 @@ class ScreenTranslatorApp:
         else:
             messagebox.showwarning("Warning", "Please enter an API Key.")
 
+    def save_shortcut_ui(self):
+        new_shortcut = self.shortcut_entry.get().strip()
+        if new_shortcut:
+            try:
+                # Remove old hotkey
+                try:
+                    keyboard.remove_hotkey(self.shortcut)
+                except Exception:
+                    pass # Might not be registered if it failed initially
+
+                # Try to register new hotkey
+                keyboard.add_hotkey(new_shortcut, lambda: self.root.after(0, self.start_snip))
+                
+                # If successful, update state and save
+                self.shortcut = new_shortcut
+                self.preferences["shortcut"] = self.shortcut
+                self.save_preferences()
+                messagebox.showinfo("Success", "Shortcut updated successfully!")
+            except Exception as e:
+                # Revert to old hotkey if new one fails
+                try:
+                    keyboard.add_hotkey(self.shortcut, lambda: self.root.after(0, self.start_snip))
+                except Exception:
+                    pass
+                messagebox.showerror("Error", f"Invalid shortcut: {e}")
+        else:
+            messagebox.showwarning("Warning", "Please enter a shortcut.")
+
     def delete_api_key_ui(self):
         self.api_key = None
         self.api_entry.delete(0, tk.END)
@@ -184,7 +245,8 @@ class ScreenTranslatorApp:
             "2. Click '+ New' or use the hotkey to start snipping.\n"
             "3. Select an area on the screen to translate.\n\n"
             "Hotkeys:\n"
-            "• Win + Shift + A: Start Snipping\n"
+            "Hotkeys:\n"
+            f"• {self.shortcut}: Start Snipping\n"
             "• Esc: Cancel Snipping"
         )
         messagebox.showinfo("Help", help_text)
@@ -260,6 +322,25 @@ class ScreenTranslatorApp:
                              relief="flat", padx=10, cursor="hand2")
         get_key_btn.pack(side="left", padx=(0, 5))
 
+        # Shortcut Section
+        shortcut_frame = tk.LabelFrame(main_frame, text="Shortcut", font=(self.font_family, 10),
+                                  bg=self.colors["bg"], fg=self.colors["secondary_text"],
+                                  bd=1, relief="solid")
+        shortcut_frame.pack(fill="x", pady=(0, 20), ipady=5)
+
+        self.shortcut_entry = tk.Entry(shortcut_frame, font=("Arial", 10), 
+                                  bg=self.colors["text_bg"], fg=self.colors["text_fg"],
+                                  relief="flat", bd=5)
+        self.shortcut_entry.pack(side="left", fill="x", expand=True, padx=(10, 5), pady=5)
+        self.shortcut_entry.insert(0, self.shortcut)
+
+        shortcut_save_btn = tk.Button(shortcut_frame, text="Save", command=self.save_shortcut_ui,
+                             font=(self.font_family, 9),
+                             bg=self.colors["accent"], fg="white",
+                             activebackground="#006CC1", activeforeground="white",
+                             relief="flat", padx=10, cursor="hand2")
+        shortcut_save_btn.pack(side="left", padx=5)
+
         # Language Selection
         lang_frame = tk.Frame(main_frame, bg=self.colors["bg"])
         lang_frame.pack(fill="x", pady=(0, 20))
@@ -292,6 +373,17 @@ class ScreenTranslatorApp:
                               activebackground=self.colors["btn_active"], activeforeground=self.colors["btn_fg"],
                               relief="flat", padx=10, pady=5, cursor="hand2")
         theme_btn.pack(side="right")
+
+        # Admin / Game Mode Button (if not admin)
+        if not self.is_admin():
+            admin_btn = tk.Button(toolbar, text="⚠ Game Mode", command=self.restart_as_admin,
+                                  font=(self.font_family, 10),
+                                  bg="#FF9800", fg="white", # Orange warning color
+                                  activebackground="#F57C00", activeforeground="white",
+                                  relief="flat", padx=10, pady=5, cursor="hand2")
+            admin_btn.pack(side="right", padx=(0, 10))
+            
+            # Add tooltip logic or simple hover if needed, but button text is clear enough for now.
 
     def toggle_theme(self):
         self.current_theme = "light" if self.current_theme == "dark" else "dark"

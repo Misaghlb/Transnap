@@ -17,7 +17,7 @@ It's designed to be fast, unobtrusive, and easy to use, with a special focus on 
 
 ### ✨ Features
 
-*   **Instant Snipping:** Press `Win + Shift + A` to freeze your screen and select any text.
+*   **Instant Snipping:** Press `Win + Shift + A` (default, customizable) to freeze your screen and select any text.
 *   **AI-Powered:** Uses the advanced Google Gemini API for natural and accurate translations.
 *   **Multi-Language Support:** Translate text into over 50 languages including English, German, French, Spanish, Chinese, Japanese, and more.
 *   **Persian Optimized:** full Right-to-Left (RTL) support for a perfect reading experience.
@@ -29,10 +29,18 @@ It's designed to be fast, unobtrusive, and easy to use, with a special focus on 
 3.  **Save Key:** Enter your API key and click "Save". You only need to do this once!
 4.  **Select Language:** Choose your desired target language from the dropdown menu.
 5.  **Snap & Translate:**
-    *   Click **+ New** or press `Win + Shift + A`.
+    *   Click **+ New** or press the hotkey (default `Win + Shift + A`).
     *   Drag your mouse to select the text you want to translate.
     *   Wait a moment, and the translation will appear in a clean, readable window.
     *   Press `Esc` if you change your mind and want to cancel the snip.
+    *   **Note for Gamers:** If the shortcut doesn't work inside a game, click the **⚠ Game Mode** button (or run the app as Administrator).
+
+### ❓ Troubleshooting
+
+**Shortcut not working in games?**
+Some games run with high privileges or block external inputs. To fix this:
+1.  Click the **⚠ Game Mode** button in the app toolbar.
+2.  Or, right-click `Transnap.exe` and select **Run as Administrator**.
 
 ### 🤝 Development / Contribution
 
@@ -69,7 +77,7 @@ It's designed to be fast, unobtrusive, and easy to use, with a special focus on 
 
 ### ✨ ویژگی‌ها
 
-*   **اسکرین‌شات فوری:** با فشردن کلیدهای `Win + Shift + A` صفحه را فریز کنید و متن دلخواهتان را انتخاب نمایید.
+*   **اسکرین‌شات فوری:** با فشردن کلیدهای `Win + Shift + A` (پیش‌فرض، قابل تغییر) صفحه را فریز کنید و متن دلخواهتان را انتخاب نمایید.
 *   **قدرت هوش مصنوعی:** استفاده از مدل پیشرفته Google Gemini برای ترجمه‌هایی روان و دقیق.
 *   **پشتیبانی از تمام زبان‌ها:** ترجمه متن به بیش از ۵۰ زبان زنده دنیا از جمله انگلیسی، آلمانی، فرانسوی، اسپانیایی، چینی، ژاپنی و ...
 *   **بهینه‌شده برای فارسی:** پشتیبانی کامل از چینش راست‌چین (RTL).
@@ -81,10 +89,18 @@ It's designed to be fast, unobtrusive, and easy to use, with a special focus on 
 ۳. **ذخیره کلید:** کلید API خود را وارد کرده و دکمه "Save" را بزنید. (فقط بار اول نیاز است!)
 ۴. **انتخاب زبان:** زبان مقصد خود را از منوی کشویی انتخاب کنید.
 ۵. **انتخاب و ترجمه:**
-    *   دکمه **+ New** را بزنید یا از کلید میانبر `Win + Shift + A` استفاده کنید.
+    *   دکمه **+ New** را بزنید یا از کلید میانبر (پیش‌فرض `Win + Shift + A`) استفاده کنید.
     *   با موس کادری دور متن مورد نظر بکشید.
     *   چند لحظه صبر کنید تا ترجمه در پنجره‌ای تمیز و خوانا ظاهر شود.
     *   اگر منصرف شدید، با زدن کلید `Esc` حالت انتخاب را لغو کنید.
+    *   **نکته برای گیمرها:** اگر کلید میانبر در بازی کار نمی‌کند، دکمه **⚠ Game Mode** را بزنید (یا برنامه را به صورت Run as Administrator اجرا کنید).
+
+### ❓ رفع اشکال
+
+**کلید میانبر در بازی کار نمی‌کند؟**
+برخی بازی‌ها دسترسی‌های سطح بالا دارند و جلوی کلیدهای میانبر را می‌گیرند. برای حل مشکل:
+۱. دکمه **⚠ Game Mode** را در نوار ابزار برنامه بزنید.
+۲. یا روی فایل `Transnap.exe` کلیک راست کرده و **Run as Administrator** را انتخاب کنید.
 
 ### 🤝 توسعه و مشارکت
 
