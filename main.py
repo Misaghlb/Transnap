@@ -413,11 +413,40 @@ class ScreenTranslatorApp:
             
         self.result_window = tk.Toplevel(self.root)
         self.result_window.title("Translation Result")
+        
+        # Make frameless and topmost
+        self.result_window.overrideredirect(True)
+        self.result_window.attributes("-topmost", True)
+        
         self.result_window.geometry("550x500")
-        self.result_window.configure(bg=self.colors["bg"])
+        # Add border
+        self.result_window.configure(bg=self.colors["bg"], highlightthickness=1, highlightbackground=self.colors["secondary_text"])
         
         # Handle window closing to show main window
+        # For frameless, we need our own close mechanism, but keep this for safety
         self.result_window.protocol("WM_DELETE_WINDOW", self.on_result_window_close)
+        
+        # Custom Title Bar
+        title_bar = tk.Frame(self.result_window, bg=self.colors["bg"], relief="flat")
+        title_bar.pack(fill="x", padx=2, pady=2)
+        
+        # Title
+        lbl_title = tk.Label(title_bar, text="Translation Result", font=(self.font_family, 10, "bold"),
+                             bg=self.colors["bg"], fg=self.colors["fg"])
+        lbl_title.pack(side="left", padx=5)
+        
+        # Close Button
+        close_btn = tk.Button(title_bar, text="✕", command=self.on_result_window_close,
+                              font=("Arial", 10), bg=self.colors["bg"], fg=self.colors["fg"],
+                              activebackground="#e81123", activeforeground="white",
+                              bd=0, relief="flat", width=4, cursor="hand2")
+        close_btn.pack(side="right")
+        
+        # Dragging bindings
+        title_bar.bind("<ButtonPress-1>", self.start_move)
+        title_bar.bind("<B1-Motion>", self.do_move)
+        lbl_title.bind("<ButtonPress-1>", self.start_move)
+        lbl_title.bind("<B1-Motion>", self.do_move)
         
         # Main container
         container = tk.Frame(self.result_window, bg=self.colors["bg"])
@@ -426,7 +455,7 @@ class ScreenTranslatorApp:
         # Text Area - Using Canvas for image display
         # Create a frame to hold canvas and scrollbar
         canvas_frame = tk.Frame(container, bg=self.colors["text_bg"])
-        canvas_frame.pack(fill="both", expand=True, padx=15, pady=15)
+        canvas_frame.pack(fill="both", expand=True, padx=15, pady=(5, 15))
         
         # Add scrollbar
         self.scrollbar = tk.Scrollbar(canvas_frame, orient="vertical")
@@ -457,6 +486,17 @@ class ScreenTranslatorApp:
                              activebackground=self.colors["btn_active"], activeforeground=self.colors["btn_fg"], 
                              relief="flat", padx=15, pady=5, cursor="hand2")
         copy_btn.pack(side="right")
+
+    def start_move(self, event):
+        self.x = event.x
+        self.y = event.y
+
+    def do_move(self, event):
+        deltax = event.x - self.x
+        deltay = event.y - self.y
+        x = self.result_window.winfo_x() + deltax
+        y = self.result_window.winfo_y() + deltay
+        self.result_window.geometry(f"+{x}+{y}")
 
     def on_result_window_close(self):
         self.result_window.destroy()
