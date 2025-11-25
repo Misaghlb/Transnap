@@ -245,7 +245,6 @@ class ScreenTranslatorApp:
             "2. Click '+ New' or use the hotkey to start snipping.\n"
             "3. Select an area on the screen to translate.\n\n"
             "Hotkeys:\n"
-            "Hotkeys:\n"
             f"• {self.shortcut}: Start Snipping\n"
             "• Esc: Cancel Snipping"
         )
