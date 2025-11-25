@@ -62,6 +62,14 @@ class ScreenTranslatorApp:
         self.root.resizable(True, True)
         self.root.minsize(450, 400)
         
+        # Set Icon
+        try:
+            icon_path = self.resource_path("assets/icon.ico")
+            if os.path.exists(icon_path):
+                self.root.iconbitmap(icon_path)
+        except Exception as e:
+            print(f"Failed to set icon: {e}")
+        
         self.current_theme = "dark"
         self.colors = self.THEMES[self.current_theme]
         
@@ -751,3 +759,4 @@ if __name__ == "__main__":
         pass
     app = ScreenTranslatorApp()
     app.run()
+A

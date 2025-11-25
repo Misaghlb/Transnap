@@ -20,9 +20,21 @@ class GeminiTranslator:
         
         prompt = f"You are a professional translator tasked with converting text in this image into fluent, natural {target_lang}. Extract all visible text from the image and translate it with precision, using {target_lang} idioms, formal native structures, and a refined literary tone. Preserve the original text formatting as much as possible, including paragraph structure and any visible formatting. Provide only the translated content without any additional comments or explanations."
         try:
-            # Convert image to base64
+            # Optimize image size and format for faster upload
+            # Resize if too large (max dimension 1024px)
+            max_dimension = 1024
+            if max(image.size) > max_dimension:
+                ratio = max_dimension / max(image.size)
+                new_size = (int(image.width * ratio), int(image.height * ratio))
+                image = image.resize(new_size, Image.Resampling.LANCZOS)
+
+            # Convert image to base64 (JPEG format for better compression)
             buffered = io.BytesIO()
-            image.save(buffered, format="PNG")
+            # Convert to RGB if necessary (JPEG doesn't support RGBA)
+            if image.mode in ('RGBA', 'P'):
+                image = image.convert('RGB')
+                
+            image.save(buffered, format="JPEG", quality=85)
             img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
 
             payload = {
@@ -31,7 +43,7 @@ class GeminiTranslator:
                         {"text": prompt},
                         {
                             "inline_data": {
-                                "mime_type": "image/png",
+                                "mime_type": "image/jpeg",
                                 "data": img_str
                             }
                         }
